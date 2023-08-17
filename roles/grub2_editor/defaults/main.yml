@@ -1,0 +1,3 @@
+grup_options:
+  - {key: GRUB_CMDLINE_LINUX, value: 'fsck.mode=force'}
+  - {key: GRUB_CMDLINE_LINUX, value: 'fsck.repair=yes'}

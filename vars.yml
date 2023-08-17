@@ -1,0 +1,21 @@
+---
+- name: Teste variables
+  hosts: all
+  tasks:
+    - name: Register
+      command: hostname
+      register: register
+
+    - name: Set_fact
+      set_fact:
+        fact: "{{register.stdout}}"
+
+    - name: Debug
+      debug:
+        msg: >
+          invenory_hostname:{{inventory_hostname}}
+          register:{{register.stdout}}
+          set_fact:{{fact}}
+          fact:{{ansible_facts['nodename']}}
+          hostvars:{{hostvars[inventory_hostname]['ansible_facts']['nodename']}}
+          hostvars_fact:{{hostvars['hostnamexyz']['fact']}}

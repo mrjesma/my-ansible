@@ -1,0 +1,97 @@
+---
+- hosts: all
+  vars:
+    myDic:
+      simple:
+        field1: 1
+        field2: 2
+        field3:
+          field31: 31
+          field32: 32
+      users:
+        - name: user1
+          path: test1
+          auth: 
+            - auth1
+            - auth2
+        - name: user2
+          path: test2
+          auth:
+            - auth2
+            - auth3
+      lacp_groups:
+        - master: lacp0
+          network: 10.65.100.0/24
+          gateway: 10.65.100.1
+          dns4:
+            - 10.65.100.10
+            - 10.65.100.11
+          interfaces:
+            - em1
+            - em2
+        - master: lacp1
+          network: 10.65.120.0/24
+          gateway: 10.65.120.1
+          dns4:
+            - 10.65.100.10
+            - 10.65.100.11
+          interfaces:
+            - em3
+            - em4
+        - master: lacp2
+          network: 10.65.120.0/24
+          gateway: 10.65.120.1
+          dns4:
+            - 10.65.100.10
+            - 10.65.100.11
+          interfaces:
+            - em1
+            - em4
+  tasks:
+    - name: Test flattened lookup
+      debug:
+        msg: "Flattened {{myDic.simple}} ... {{ lookup('flattened', myDic.simple) }}"
+    - name: Test dict lookup
+      debug:
+        msg: "Dict {{myDic.simple}} .. {{ lookup('dict', myDic.simple) }}"
+
+    - name: Test items lookup
+      debug:
+        msg: "item.name {{ item.name }} ... item.uid {{ item.uid }} ... item.groups {{ item.groups }}"
+      with_items:
+        - { name: testuser1, uid: 1002, groups: "wheel, staff" }
+        - { name: testuser2, uid: 1003, groups: staff }
+
+    - name: Test nested lookup
+      debug:
+        msg: "item0 {{item[0]}} ... item1 {{item[1]}}"
+      with_nested:
+        - ['usr1','user2']
+        - ['db1','db2','db3']
+    - name: Test cartesian lookup
+      debug:
+        msg: "item0 {{item[0]}} ... item1 {{item[1]}}"
+      with_cartesian:
+        - ['usr1','user2']
+        - ['db1','db2','db3']
+
+    - name: Test subelements lookup
+      debug:
+        # msg: "Subelemente of {{myDic}} ... {{item}}"
+        var: item
+      with_subelements:
+        - "{{myDic.users}}"
+        - auth
+
+    - name: Test together lookup
+      debug:
+        msg: "item {{item}}"
+      with_together:
+        - ['a','b','c','d']
+        - [1,2,3]
+
+    - name: Test contains test
+      debug:
+        #msg: "{{ (myDic.lacp_groups|selectattr('interfaces', 'contains', 'em1')|first).master }}"
+        var: myDic.lacp_groups|selectattr('interfaces', 'contains', 'em1')|list
+

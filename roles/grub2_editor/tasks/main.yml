@@ -1,0 +1,67 @@
+---
+
+### Block to ADD options on grub
+
+- name: Add options 
+  block:
+    
+    - name: Edit grub
+      lineinfile:
+        backrefs: true
+        path: '/etc/sysconfig/grub'
+        regexp: '^\s*{{ item.key }}\s*="(?!.*{{ item.value }})(.*)"$'
+        line: '{{ item.key }}="\1 {{ item.value }}"'
+      loop: "{{ grub_options }}"
+      become: True
+      register: grubfile
+
+    - name: Create backup file
+      copy:
+        src: /boot/grub2/grub.cfg
+        dest: /tmp/
+        remote_src: yes
+        backup: yes
+      become: True
+
+    - name: Run grub2-mkconfig
+      command: grub2-mkconfig -o /boot/grub2/grub.cfg
+      become: True
+      #when: grubfile.changed
+
+  tags:
+    - never
+    - add
+
+
+
+### Block to remove options on grub
+
+- name: Remove options
+  block:
+
+    - name: Edit grub
+      lineinfile:
+        backrefs: true
+        path: '/etc/sysconfig/grub'
+        regexp: '^\s*{{ item.key }}\s*="(.*?)\s*{{ item.value }}\s*(.*)"'
+        line: '{{ item.key }}="\1\2"'
+      loop: "{{ grub_options }}"
+      become: True
+      register: grubfile
+
+    - name: Create backup file
+      copy:
+        src: /boot/grub2/grub.cfg
+        dest: /tmp/
+        remote_src: yes
+        backup: yes
+      become: True
+
+    - name: Run grub2-mkconfig
+      command: grub2-mkconfig -o /boot/grub2/grub.cfg
+      become: True
+      #when: grubfile.changed
+
+  tags:
+    - never
+    - rem
