@@ -1,5 +1,5 @@
 ---
-- name: Teste variables
+- name: Test variables
   hosts: all
   tasks:
     - name: Register
