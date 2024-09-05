@@ -1,21 +1,31 @@
 ---
+#####################################################################
+# This play show variable manipulation examples
+# - Register
+# - set_facts
+# - ansible facts
+# - magic variables
+
 - name: Test variables
-  hosts: all
+  hosts: localhost
+
   tasks:
-    - name: Register
+
+    - name: Creating variable from tasks output using 'register'
       command: hostname
       register: register
 
-    - name: Set_fact
+    - name: Creating variable associated to the current host using 'set_fact' module
       set_fact:
         fact: "{{register.stdout}}"
 
-    - name: Debug
+    - name: Output variables
       debug:
-        msg: >
-          invenory_hostname:{{inventory_hostname}}
-          register:{{register.stdout}}
-          set_fact:{{fact}}
-          fact:{{ansible_facts['nodename']}}
-          hostvars:{{hostvars[inventory_hostname]['ansible_facts']['nodename']}}
-          hostvars_fact:{{hostvars['hostnamexyz']['fact']}}
+        msg:
+          - invenory_hostname:{{inventory_hostname}}
+          - register:{{register.stdout}}
+          - set_fact:{{fact}}
+          - fact:{{ansible_facts['nodename']}}
+          - hostvars:{{hostvars[inventory_hostname]['ansible_facts']['nodename']}}
+          - hostvars_fact:{{hostvars['localhost']['fact']}}
+

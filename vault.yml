@@ -1,19 +1,16 @@
 ---
-## call ansible-playbook with --ask-vault-pass parameter or --vault-password-file
+#####################################################################
+# This play will read variables from vault file
+# Run ansible-playbook with --ask-vault-pass or --vault-password-file
+# Vault password: 123
 
-- name: Accessing Vaults in Playbooks
-  hosts: all
+- name: Accessing Vault in Playbooks
+  hosts: localhost
   vars_files: vault.txt
+
   tasks:
+
     - name: Show secret1 value
       debug:
         msg: "{{ secret1 }}"
 
-    # Testing ansible_user and ansible_password in vault file
-    - name: Test command
-      command: date
-      register: date
-
-    - name: Debug
-      debug:
-        msg: "{{date.stdout}}"

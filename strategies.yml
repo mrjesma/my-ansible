@@ -1,0 +1,75 @@
+---
+#####################################################################
+# This play will run all tasks for:
+# - first for only 1 host
+# - then for 5 hosts
+# - after that ir will run 2 by 2 hosts untill all hosts finished
+
+- name: Using serial key as a list
+  hosts: all
+  gather_facts: False
+  serial:
+    - 1
+    - 5
+    - 2
+
+  tasks:
+
+    - name: Debug 1
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} debug 1"
+
+    - name: Debug 2
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} debug 2"
+
+
+
+#####################################################################
+# This play will run all tasks for:
+# - first for only 1 host
+# - then for 2 hosts
+# - after that it will split the remaining hosts in groups of 30%
+
+- name: Using serial key as a list mixed with percentage
+  hosts: all
+  gather_facts: False
+  serial:
+    - 1
+    - 2
+    - "30%"
+
+  tasks:
+
+    - name: Debug 1
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} debug 1"
+
+    - name: Debug 2
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} debug 2"
+
+
+
+#####################################################################
+# Using throttle. It can be used in play/role/block/task
+# This play is limited to execute for 2 hosts at time and the first task is limited to execute for only 1 host at time
+
+- name: Using throttle
+  hosts: dbserver
+  gather_facts: False
+  throttle: 2
+
+  tasks:
+
+    - name: Debug 1
+      throttle: 1
+      delegate_to: localhost
+      ansible.builtin.wait_for:
+        timeout: 2
+
+    - name: Debug 2
+      delegate_to: localhost
+      ansible.builtin.wait_for:
+        timeout: 2
+

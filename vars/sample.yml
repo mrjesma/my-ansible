@@ -1,0 +1,46 @@
+myDic:
+  simple:
+    field1: 1
+    field2: 2
+    field3:
+      field31: 31
+      field32: 32
+  users:
+    - name: user1
+      path: test1
+      auth: 
+        - auth1
+        - auth2
+    - name: user2
+      path: test2
+      auth:
+        - auth2
+        - auth3
+  lacp_groups:
+    - master: lacp0
+      network: 10.65.100.0/24
+      gateway: 10.65.100.1
+      dns4:
+        - 10.65.100.10
+        - 10.65.100.11
+      interfaces:
+        - em1
+        - em2
+    - master: lacp1
+      network: 10.65.120.0/24
+      gateway: 10.65.120.1
+      dns4:
+        - 10.65.100.10
+        - 10.65.100.11
+      interfaces:
+        - em3
+        - em4
+    - master: lacp2
+      network: 10.65.120.0/24
+      gateway: 10.65.120.1
+      dns4:
+        - 10.65.100.10
+        - 10.65.100.11
+      interfaces:
+        - em1
+        - em4
