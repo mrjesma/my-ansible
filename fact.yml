@@ -1,0 +1,80 @@
+- name: Conditional set_fact
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+
+    project: foo
+
+  tasks:
+
+    # Simple strategy where it runs a task for each option
+    - name: Set name for project 'foo'
+      set_fact:
+        name: bar
+      when: project == 'foo'
+    - name: Set name for project 'baz'
+      set_fact:
+        name: bat
+      when: project == 'baz'
+    - debug: var=name
+
+    # Single task, but this sometimes can lead in extra spaces in the string
+    - name: Set name
+      set_fact:
+        git_status: >-
+          {{ "bar" if project == "foo" }}
+          {{ "bat" if project == "baz" }}
+    - debug: var=name
+
+    # Single task, but with spaces trimmed
+    - name: Set name
+      set_fact:
+        name: "{{ name_value | trim }}"
+      vars:
+        name_value: >-
+          {{ "bar" if project == "foo" }}
+          {{ "bat" if project == "baz" }}
+    - debug: var=name
+
+
+
+- name: Conditional set_fact based on previous task output
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+
+    project: foo
+
+  tasks:
+    # This will not work. out variable is rewhiten even when skiped (project == 'foo')
+    - name: Foo task
+      shell: echo bar
+      when: project == 'foo'
+      register: out
+
+    - name: Baz task
+      shell: echo bat
+      when: project == 'baz'
+      register: out
+
+    - debug: var=out.stdout
+
+    # Uset two register and a contidion on set_fact to make it work
+    - name: Foo task
+      shell: echo bar
+      when: project == 'foo'
+      register: out_foo
+
+    - name: Baz task
+      shell: echo bat
+      when: project == 'baz'
+      register: out_baz
+
+    - name: Set git_status fact
+      set_fact:
+        name: "{{ (out_foo if project == 'foo' else out_baz).stdout }}"
+
+    - debug: var=name
+
