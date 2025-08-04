@@ -1,0 +1,36 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+
+    # Run task in BG for max 60s
+    - shell: sleep 15
+      async: 60
+      poll: 0
+      register: async1
+
+    # Run task in BG for max 60s
+    - shell: sleep 10
+      async: 60
+      poll: 0
+      register: async2
+
+    # Debug both tasks registers
+    - debug: var=async1
+    - debug: var=async2
+
+    # Wait for both tasks to finish, waiting 5s between try's for at max 20 retries
+    - name: Check extract and binaries
+      async_status:
+        jid: "{{ item.job_id }}"
+      register: check_builds
+      until: check_builds.finished
+      retries: 20 #Retry 20x
+      delay: 5 #30 min
+      loop:
+        - name: "Task 1"
+          job_id: "{{ async1.ansible_job_id }}" 
+        - name: "Task 2"
+          job_id: "{{ async2.ansible_job_id }}" 
+      loop_control:
+        label: "{{ item.name }}"
+
