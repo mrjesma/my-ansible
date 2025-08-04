@@ -48,7 +48,7 @@
     project: foo
 
   tasks:
-    # This will not work. out variable is rewhiten even when skiped (project == 'foo')
+    # This will not work. out variable is rewritten even when skipped (project == 'foo')
     - name: Foo task
       shell: echo bar
       when: project == 'foo'
@@ -61,7 +61,7 @@
 
     - debug: var=out.stdout
 
-    # Uset two register and a contidion on set_fact to make it work
+    # Use two register and a condition on set_fact to make it work
     - name: Foo task
       shell: echo bar
       when: project == 'foo'
